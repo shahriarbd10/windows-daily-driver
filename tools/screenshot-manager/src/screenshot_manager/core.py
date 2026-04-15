@@ -13,6 +13,10 @@ from typing import Callable, Optional
 SUPPORTED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".bmp", ".webp"}
 
 
+def human_date(value: datetime) -> str:
+    return f"{value.day} {value.strftime('%B %Y')}"
+
+
 @dataclass
 class ManagerConfig:
     source_dir: Path
@@ -35,6 +39,8 @@ class ScreenshotManager:
         self._stop_event = threading.Event()
         self._thread: Optional[threading.Thread] = None
         self._seen: set[Path] = set()
+        self._last_cloud_error_log_at: float = 0.0
+        self._cloud_error_log_interval_seconds = 20.0
 
         self.config.source_dir.mkdir(parents=True, exist_ok=True)
         self.config.destination_dir.mkdir(parents=True, exist_ok=True)
@@ -68,18 +74,35 @@ class ScreenshotManager:
             self._stop_event.wait(self.config.poll_seconds)
 
     def _scan_once(self) -> None:
-        for item in self.config.source_dir.iterdir():
-            if not item.is_file() or item.suffix.lower() not in SUPPORTED_EXTENSIONS:
-                continue
-            if item in self._seen:
-                continue
+        try:
+            items = list(self.config.source_dir.iterdir())
+        except OSError as exc:
+            if self._is_cloud_provider_error(exc):
+                self._log_cloud_source_unavailable()
+                return
+            raise
 
-            # Skip files still being written to disk.
-            if not self._is_stable(item):
-                continue
+        for item in items:
+            try:
+                if not item.is_file() or item.suffix.lower() not in SUPPORTED_EXTENSIONS:
+                    continue
+                if item in self._seen:
+                    continue
 
-            self._process(item)
-            self._seen.add(item)
+                # Skip files still being written to disk.
+                if not self._is_stable(item):
+                    continue
+
+                self._process(item)
+                self._seen.add(item)
+            except FileNotFoundError:
+                # File was moved/deleted between scans.
+                continue
+            except OSError as exc:
+                if self._is_cloud_provider_error(exc):
+                    self._log_cloud_source_unavailable()
+                    return
+                self.logger(f"Error: {exc}")
 
     def _is_stable(self, file_path: Path) -> bool:
         first_size = file_path.stat().st_size
@@ -87,16 +110,28 @@ class ScreenshotManager:
         second_size = file_path.stat().st_size
         return first_size == second_size
 
+    def _is_cloud_provider_error(self, exc: OSError) -> bool:
+        return getattr(exc, "winerror", None) == 362
+
+    def _log_cloud_source_unavailable(self) -> None:
+        now = time.monotonic()
+        if now - self._last_cloud_error_log_at >= self._cloud_error_log_interval_seconds:
+            self.logger(
+                "Source unavailable (WinError 362). If this is a OneDrive folder, start OneDrive or choose a local folder."
+            )
+            self._last_cloud_error_log_at = now
+
     def _process(self, source_file: Path) -> None:
         timestamp = datetime.now()
         target_dir = self.config.destination_dir
+        date_text = human_date(timestamp)
 
         if self.config.organize_by_date:
-            target_dir = target_dir / timestamp.strftime("%Y-%m-%d")
+            target_dir = target_dir / date_text
             target_dir.mkdir(parents=True, exist_ok=True)
 
         if self.config.rename_files:
-            base_name = f"shot_{timestamp.strftime('%Y-%m-%d_%H-%M-%S')}"
+            base_name = f"shot_{date_text}_{timestamp.strftime('%H-%M-%S')}"
             target_file = self._next_available_name(target_dir, base_name, source_file.suffix.lower())
         else:
             target_file = self._next_available_name(target_dir, source_file.stem, source_file.suffix.lower())

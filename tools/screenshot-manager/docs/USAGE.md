@@ -12,7 +12,9 @@ Launch Screenshot Manager from Desktop or Start Menu.
 ## 3. Configure Behavior
 
 - Organize by date folder: creates `YYYY-MM-DD` subfolders
-- Rename to timestamp: format like `shot_2026-04-15_19-20-04.png`
+- Rename to timestamp: format like `shot_15 April 2026_19-20-04.png`
+
+Date folders now use format like `15 April 2026`.
 
 ## 4. Start Processing
 

@@ -16,6 +16,11 @@ node_modules/
 dist/
 build/
 
+# Release binaries committed intentionally
+!tools/screenshot-manager/release/
+tools/screenshot-manager/release/*
+!tools/screenshot-manager/release/ScreenshotManager.exe
+
 # VS Code / IDE
 .vscode/*
 !.vscode/extensions.json
