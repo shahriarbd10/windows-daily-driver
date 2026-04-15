@@ -1,0 +1,2 @@
+[console_scripts]
+screenshot-manager = screenshot_manager.app:main

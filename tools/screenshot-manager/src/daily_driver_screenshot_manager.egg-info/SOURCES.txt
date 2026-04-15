@@ -1,0 +1,11 @@
+README.md
+pyproject.toml
+src/daily_driver_screenshot_manager.egg-info/PKG-INFO
+src/daily_driver_screenshot_manager.egg-info/SOURCES.txt
+src/daily_driver_screenshot_manager.egg-info/dependency_links.txt
+src/daily_driver_screenshot_manager.egg-info/entry_points.txt
+src/daily_driver_screenshot_manager.egg-info/top_level.txt
+src/screenshot_manager/__init__.py
+src/screenshot_manager/__main__.py
+src/screenshot_manager/app.py
+src/screenshot_manager/core.py
