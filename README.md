@@ -1,43 +1,74 @@
-# Daily Driver
+# Windows Daily Driver
 
-A collection of small Windows software tools that remove everyday friction.
+Windows Daily Driver is a personal utility software initiative focused on small, practical Windows tools that remove daily friction and save repetitive effort.
 
-## Goals
+## Vision
 
-- Build practical utilities for common day-to-day tasks
-- Keep each tool focused, reliable, and easy to run
-- Share reusable logic across tools when it makes sense
-- Maintain clear docs and tests as the project grows
+Build a toolbox of focused Windows desktop apps that are:
+
+- Fast to launch and simple to use
+- Reliable in normal daily workflows
+- Safe for non-technical users
+- Installable as standalone EXE tools
+- Easy to extend with shared patterns
+
+## Product Philosophy
+
+- Problem-first development: each tool solves one clear pain point
+- Small surface area: minimal UI, minimal setup, clear actions
+- Practical safety: destructive actions require explicit warning and confirmation gates
+- Local-first behavior: avoid cloud dependency assumptions
+- Ship-ready artifacts: each tool should build into a downloadable EXE
+
+## Current Tools
+
+1. `tools/screenshot-manager`
+- GUI utility that monitors a screenshot folder and organizes files
+- Optional date-based folder organization and timestamp renaming
+- Human-readable date format (example: `15 April 2026`)
+- Activity log in UI and SQLite indexing foundation for future search
+- Handles OneDrive/cloud-provider availability errors gracefully
+
+2. `tools/recycle-bin-cleaner`
+- Dedicated cleanup app for safely emptying Recycle Bin
+- Reads Recycle Bin stats through Windows shell APIs
+- Strong caution workflow before destructive action:
+  - Caution checkbox
+  - Required keyword (`CLEAR`)
+  - Final confirmation dialog
+
+## Engineering Direction
+
+- Desktop-first Windows GUI with lightweight Python stack
+- Per-tool packaging with PyInstaller EXE output
+- Scripted build/install flows for repeatable releases
+- Shared integration pattern between tools where useful
+- Safety and resilience prioritized over feature volume
 
 ## Project Structure
 
-- `tools/` - Individual utility apps or scripts (one folder per tool)
-- `shared/` - Reusable modules, helpers, and common code
-- `scripts/` - Project automation scripts (setup, lint, release, etc.)
-- `docs/` - Architecture notes, design docs, and usage guides
+- `tools/` - Individual utility apps (one folder per tool)
+- `shared/` - Reusable modules and helpers
+- `scripts/` - Project automation scripts
+- `docs/` - Architecture notes and usage docs
 - `tests/` - Cross-tool and integration tests
 
-## How We Build Here
+## Strategic Next Steps
 
-- Start with a problem-first tool idea
-- Define a small MVP and acceptance criteria
-- Implement in isolated tool folders under `tools/`
-- Add tests before expanding features
-- Document installation and usage in each tool folder
+1. Release consistency
+- Standardize release folders for all tools
+- Publish versioned binaries and changelog notes
 
-## Suggested First Tools
+2. Tool ecosystem growth
+- Add Bulk File Renamer
+- Add Temp File Cleaner
+- Add Startup App Health Checker
 
-1. Clipboard history cleaner / formatter
-2. Bulk file renamer with preview mode
-3. Screenshot organizer by date + OCR text index
-4. Startup apps health checker
-5. Temporary files smart cleanup utility
+3. Professional polish
+- Add persistent settings per tool
+- Add dark/light theme toggle
+- Add in-app "Open Logs" and "Open Data Folder"
 
-## Implemented Tool
-
-- `tools/screenshot-manager` - Windows GUI app to auto-organize and rename screenshots with install/uninstall scripts.
-
-## Next Step
-
-Pick the first tool, then we can scaffold it end-to-end (UI/CLI, logic, tests, and packaging).
-# windows-daily-driver
+4. Reliability and testing
+- Add unit tests for core file operations and naming logic
+- Add smoke tests for build scripts and startup behavior

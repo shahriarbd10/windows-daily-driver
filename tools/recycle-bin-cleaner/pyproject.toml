@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "daily-driver-recycle-bin-cleaner"
+version = "0.1.0"
+description = "Windows Recycle Bin cleaner with explicit safety confirmations"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Daily Driver" }]
+license = { text = "MIT" }
+dependencies = []
+
+[project.scripts]
+recycle-bin-cleaner = "recycle_bin_cleaner.app:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

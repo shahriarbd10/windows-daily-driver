@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import tkinter as tk
+import subprocess
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
 
@@ -65,6 +66,7 @@ class App(tk.Tk):
         card.pack(fill=tk.BOTH, expand=True)
 
         ttk.Label(card, text="Screenshot Manager", style="Title.TLabel").grid(row=0, column=0, sticky="w")
+        ttk.Button(card, text="Recycle Bin Tool", command=self._open_recycle_bin_tool).grid(row=0, column=2, sticky="e")
         ttk.Label(
             card,
             text="Automatically organize and rename screenshots with a clean, predictable workflow.",
@@ -188,6 +190,22 @@ class App(tk.Tk):
         if self.manager:
             self.manager.stop()
         self.destroy()
+
+    def _open_recycle_bin_tool(self) -> None:
+        repo_root = Path(__file__).resolve().parents[4]
+        tool_exe = repo_root / "tools" / "recycle-bin-cleaner" / "dist" / "RecycleBinCleaner.exe"
+
+        if tool_exe.exists():
+            subprocess.Popen([str(tool_exe)], shell=False)
+            self.status_var.set("Opened Recycle Bin Tool")
+            return
+
+        messagebox.showinfo(
+            "Recycle Bin Tool Not Built",
+            "Recycle Bin Tool EXE was not found yet.\n\n"
+            "Build it from:\n"
+            "tools/recycle-bin-cleaner/scripts/build.ps1",
+        )
 
 
 def main() -> None:
